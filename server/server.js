@@ -30,17 +30,36 @@ app.use((req, res, next) => {
 const healthRoute = require('./routes/health');
 app.use('/api/health', healthRoute);
 
-// Base route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to Elderly Pension Disbursement Tracker API (Problem Statement 126)',
-    health: '/api/health'
-  });
-});
+const path = require('path');
 
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found' });
+// Serve static frontend files from client/dist if built
+const clientDistPath = path.join(__dirname, '../client/dist');
+const fs = require('fs');
+
+if (fs.existsSync(clientDistPath)) {
+  console.log('📦 Serving production frontend build from client/dist');
+  app.use(express.static(clientDistPath));
+
+  // Catch-all route to serve React index.html for client-side routing
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+} else {
+  // Base route in development
+  app.get('/', (req, res) => {
+    res.json({
+      message: 'Welcome to Elderly Pension Disbursement Tracker API (Problem Statement 126)',
+      health: '/api/health'
+    });
+  });
+}
+
+// 404 Handler for undefined API routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found' });
 });
 
 // Error handling middleware
