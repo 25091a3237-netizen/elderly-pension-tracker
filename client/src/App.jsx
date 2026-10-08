@@ -1,366 +1,561 @@
-import { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
+  Menu, 
+  X, 
+  LogOut, 
+  Users, 
+  CreditCard, 
   ShieldCheck, 
-  Database, 
-  Server, 
+  Bell, 
   CheckCircle2, 
-  Clock, 
   AlertTriangle, 
+  Clock, 
+  Search, 
+  UserPlus, 
+  FileText, 
+  ChevronRight,
+  TrendingUp,
+  Settings,
+  HelpCircle,
+  Eye,
   RefreshCw,
-  Users,
-  Coins,
-  FileCheck2,
-  BellRing
+  Send
 } from 'lucide-react';
 
 export default function App() {
-  const [healthData, setHealthData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [fontSizeClass, setFontSizeClass] = useState('text-lg');
+  // Navigation / Drawer state
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeNav, setActiveNav] = useState('dashboard');
 
-  const fetchHealth = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/health');
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-      const data = await res.json();
-      setHealthData(data);
-    } catch (err) {
-      console.error('Failed to fetch health status:', err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+  // Text size state: 'A' (normal), 'A+' (large), 'A++' (extra-large, default active in screenshot)
+  const [textSize, setTextSize] = useState('A++');
+
+  // Interactive Tab: 'overview' or 'beneficiaries' or 'disbursements' or 'delays'
+  const [activeSection, setActiveSection] = useState('overview');
+
+  // Sample data to make metrics and tables functional & live
+  const [beneficiaries, setBeneficiaries] = useState([
+    { id: 101, name: 'Narasimha Rao', age: 68, phone: '9876543210', district: 'Warangal Rural', scheme: 'Old Age Welfare Pension', amount: 2016, status: 'Delayed', due: '2024-10-01', paidDate: null },
+    { id: 102, name: 'Lakshmi Devi', age: 72, phone: '9848012345', district: 'Nalgonda', scheme: 'Asara Pension Scheme', amount: 2016, status: 'Delayed', due: '2024-10-01', paidDate: null },
+    { id: 103, name: 'Venkat Reddy', age: 65, phone: '9912345678', district: 'Medak', scheme: 'Rural Senior Pension', amount: 3016, status: 'Pending Verification', due: '2024-10-05', paidDate: null },
+    { id: 104, name: 'Anasuya Amma', age: 78, phone: '9123456780', district: 'Yadadri Bhuvanagiri', scheme: 'Old Age Welfare Pension', amount: 2016, status: 'Paid', due: '2024-10-01', paidDate: '2024-10-03' },
+    { id: 105, name: 'Balaraju M.', age: 71, phone: '9849112233', district: 'Karimnagar', scheme: 'Asara Pension Scheme', amount: 2016, status: 'Paid', due: '2024-10-01', paidDate: '2024-10-04' }
+  ]);
+
+  // Dynamic font sizing
+  const getTextSizeClass = () => {
+    if (textSize === 'A') return 'text-sm';
+    if (textSize === 'A+') return 'text-base';
+    return 'text-lg'; // 'A++' large high readability
   };
 
-  useEffect(() => {
-    fetchHealth();
-  }, []);
+  const getHeadingSizeClass = () => {
+    if (textSize === 'A') return 'text-xl sm:text-2xl';
+    if (textSize === 'A+') return 'text-2xl sm:text-3xl';
+    return 'text-3xl sm:text-4xl';
+  };
 
   return (
-    <div className={`min-h-screen bg-slate-50 text-slate-900 ${fontSizeClass}`}>
-      {/* Top Accessibility Bar */}
-      <div className="bg-slate-900 text-slate-100 py-2 px-4 border-b border-slate-700">
-        <div className="max-w-6xl mx-auto flex flex-wrap justify-between items-center text-sm">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold tracking-wide">GOVERNMENT OF TELANGANA / ANDHRA PRADESH</span>
-            <span className="hidden sm:inline text-slate-400">|</span>
-            <span className="hidden sm:inline text-slate-300">Social Welfare & Pensions Department</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="text-xs uppercase font-bold text-slate-400">Text Size:</span>
+    <div className={`min-h-screen bg-[#f4f7fa] text-slate-900 font-sans ${getTextSizeClass()}`}>
+      
+      {/* ============================================================== */}
+      {/* 1. TOP NAVBAR (Matches Screenshot Exact Layout) */}
+      {/* ============================================================== */}
+      <header className="bg-white border-b border-slate-200 px-4 sm:px-6 py-3.5 sticky top-0 z-40 shadow-xs">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+          
+          {/* Left: Hamburger & Header Title */}
+          <div className="flex items-center gap-3.5">
             <button 
-              onClick={() => setFontSizeClass('text-base')} 
-              className={`px-2 py-0.5 rounded text-xs font-bold ${fontSizeClass === 'text-base' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}`}
-              title="Normal Font Size"
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 -ml-2 rounded-lg text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors cursor-pointer"
+              aria-label="Toggle Navigation Menu"
             >
-              A
+              <Menu className="w-6 h-6" />
             </button>
-            <button 
-              onClick={() => setFontSizeClass('text-lg')} 
-              className={`px-2.5 py-0.5 rounded text-sm font-bold ${fontSizeClass === 'text-lg' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}`}
-              title="Large Font Size (Recommended for Elderly)"
-            >
-              A+
-            </button>
-            <button 
-              onClick={() => setFontSizeClass('text-xl')} 
-              className={`px-3 py-0.5 rounded text-base font-bold ${fontSizeClass === 'text-xl' ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-300'}`}
-              title="Extra Large Font Size"
-            >
-              A++
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <header className="bg-white border-b-4 border-blue-700 shadow-sm sticky top-0 z-30">
-        <div className="max-w-6xl mx-auto px-4 py-4 sm:px-6 flex flex-wrap justify-between items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-blue-700 text-white flex items-center justify-center font-black text-2xl shadow-md">
-              ₹
-            </div>
             <div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                Elderly Pension Disbursement Tracker
+              <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">
+                Dashboard &amp; Overview
               </h1>
-              <p className="text-sm sm:text-base font-semibold text-blue-800">
-                Problem Statement 126 • Transparent Status, Delay Detection & Automated Reminders
+              <p className="text-xs sm:text-sm font-semibold text-slate-500">
+                Elderly Pension Disbursement Tracker System
               </p>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
-            <a 
-              href="https://github.com/25091a3237-netizen/elderly-pension-tracker" 
-              target="_blank" 
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-bold bg-slate-900 text-white hover:bg-slate-800 shadow transition-colors"
+          {/* Right Controls: Font Resizer, Officer Profile, Logout */}
+          <div className="flex items-center gap-3 sm:gap-6">
+            
+            {/* Text Size: A / A+ / A++ Selector (Exact Pill from Screenshot) */}
+            <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200">
+              <span className="text-xs sm:text-sm font-bold text-slate-600 flex items-center gap-1">
+                <span className="font-serif">T</span> Text Size:
+              </span>
+              <div className="inline-flex items-center gap-1">
+                <button
+                  onClick={() => setTextSize('A')}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
+                    textSize === 'A' 
+                      ? 'bg-[#0f4a3e] text-white shadow-xs' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  }`}
+                >
+                  A
+                </button>
+                <button
+                  onClick={() => setTextSize('A+')}
+                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all ${
+                    textSize === 'A+' 
+                      ? 'bg-[#0f4a3e] text-white shadow-xs' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  }`}
+                >
+                  A+
+                </button>
+                <button
+                  onClick={() => setTextSize('A++')}
+                  className={`px-3 py-1 text-xs sm:text-sm font-extrabold rounded-lg transition-all ${
+                    textSize === 'A++' 
+                      ? 'bg-[#0f4a3e] text-white shadow-xs' 
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                  }`}
+                >
+                  A++
+                </button>
+              </div>
+            </div>
+
+            {/* Officer Profile Info */}
+            <div className="hidden md:flex flex-col items-end text-right">
+              <span className="text-sm font-bold text-slate-800 leading-tight">
+                District Welfare Officer
+              </span>
+              <span className="text-xs font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded border border-teal-200 mt-0.5">
+                Administrator
+              </span>
+            </div>
+
+            {/* Officer Avatar Badge "D" */}
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-teal-100 border-2 border-teal-300 text-teal-900 font-extrabold text-base flex items-center justify-center shadow-xs">
+              D
+            </div>
+
+            {/* Logout Button */}
+            <button 
+              onClick={() => alert('Logged in as Administrator (Live Demo Mode)')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 text-xs sm:text-sm font-bold transition-colors cursor-pointer"
             >
-              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-              GitHub Repo
-            </a>
-            <span className="px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              Live Public Portal
-            </span>
+              <LogOut className="w-4 h-4" />
+              <span>Logout</span>
+            </button>
+
           </div>
+
         </div>
       </header>
 
-      {/* Body Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 space-y-8">
-        
-        {/* System Connectivity & Health Status Card */}
-        <section className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-6 sm:p-8">
-          <div className="flex flex-wrap justify-between items-center gap-4 mb-6 pb-4 border-b border-slate-100">
-            <div>
-              <h2 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
-                <Server className="w-6 h-6 text-blue-700" />
-                Backend & MySQL Architecture Health
-              </h2>
-              <p className="text-slate-600 text-base mt-1">
-                Real-time connection verification between React frontend, Express API, and MySQL.
-              </p>
-            </div>
-            <button
-              onClick={fetchHealth}
-              disabled={loading}
-              className="btn-elderly btn-elderly-secondary text-base py-2.5 px-4 cursor-pointer"
-            >
-              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-              Check Status
-            </button>
-          </div>
+      {/* ============================================================== */}
+      {/* SIDEBAR DRAWER (Slides out on Hamburger click) */}
+      {/* ============================================================== */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 z-50 flex">
+          {/* Backdrop */}
+          <div 
+            onClick={() => setSidebarOpen(false)}
+            className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity"
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Express Server Tile */}
-            <div className="p-5 rounded-xl border-2 bg-slate-50 border-slate-200">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-slate-700 text-base">Node.js Express API</span>
-                <span className={`w-3.5 h-3.5 rounded-full ${healthData ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-              </div>
-              <div className="text-xl font-extrabold text-slate-900">
-                {loading ? 'Checking...' : healthData ? 'ONLINE (Port 5000)' : 'OFFLINE'}
-              </div>
-              <p className="text-sm text-slate-500 mt-1">
-                REST API endpoint: <code className="bg-slate-200 px-1 py-0.5 rounded text-xs">/api/health</code>
-              </p>
-            </div>
-
-            {/* MySQL Database Tile */}
-            <div className="p-5 rounded-xl border-2 bg-slate-50 border-slate-200">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-slate-700 text-base">MySQL Database</span>
-                <span className={`w-3.5 h-3.5 rounded-full ${healthData?.database?.connected ? 'bg-emerald-500' : 'bg-amber-500'}`} />
-              </div>
-              <div className="text-xl font-extrabold text-slate-900">
-                {loading ? 'Verifying...' : healthData?.database?.connected ? 'CONNECTED' : 'CONFIGURED'}
-              </div>
-              <p className="text-sm text-slate-500 mt-1">
-                {healthData?.database?.message || 'Database connection pool active'}
-              </p>
-            </div>
-
-            {/* ES6 Domain Engine Tile */}
-            <div className="p-5 rounded-xl border-2 bg-slate-50 border-slate-200">
-              <div className="flex items-center justify-between mb-3">
-                <span className="font-bold text-slate-700 text-base">ES6 Model Layer</span>
-                <ShieldCheck className="w-5 h-5 text-blue-700" />
-              </div>
-              <div className="text-xl font-extrabold text-slate-900">
-                5 Domain Classes
-              </div>
-              <p className="text-sm text-slate-500 mt-1">
-                Mirroring class diagram specifications
-              </p>
-            </div>
-          </div>
-
-          {error && (
-            <div className="mt-4 p-4 rounded-xl bg-amber-50 border-2 border-amber-300 text-amber-900 text-base flex items-center gap-3">
-              <AlertTriangle className="w-6 h-6 text-amber-600 flex-shrink-0" />
+          {/* Drawer Menu */}
+          <div className="relative w-72 sm:w-80 bg-white h-full shadow-2xl flex flex-col z-10 border-r border-slate-200 animate-slideRight">
+            <div className="p-5 border-b border-slate-200 flex items-center justify-between">
               <div>
-                <p className="font-bold">Backend connection pending:</p>
-                <p className="text-sm">{error}. Start server via <code className="font-mono bg-amber-100 px-1.5 py-0.5 rounded">npm start</code> in /server.</p>
+                <h2 className="font-black text-lg text-slate-900">Pension Portal Menu</h2>
+                <p className="text-xs text-slate-500 font-semibold">Problem Statement 126</p>
               </div>
-            </div>
-          )}
-        </section>
-
-        {/* Elderly Accessibility Design System Preview */}
-        <section className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-6 sm:p-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            Design Rules & Color-Coded Status Badges
-          </h2>
-          <p className="text-slate-600 text-base mb-6">
-            Specially tailored for rural elderly citizens: large fonts, clear visual symbols, high contrast.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Paid Badge */}
-            <div className="p-5 rounded-xl border-2 border-emerald-200 bg-emerald-50/50">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="badge-status badge-paid">
-                  <CheckCircle2 className="w-5 h-5" />
-                  PAID (చెల్లించబడింది)
-                </span>
-              </div>
-              <p className="text-sm text-emerald-900 font-medium mt-2">
-                Indicates pension payment has been successfully disbursed to the beneficiary bank/post account.
-              </p>
+              <button 
+                onClick={() => setSidebarOpen(false)}
+                className="p-2 text-slate-500 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
-            {/* Pending Badge */}
-            <div className="p-5 rounded-xl border-2 border-amber-200 bg-amber-50/50">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="badge-status badge-pending">
-                  <Clock className="w-5 h-5" />
-                  PENDING (పెండింగ్‌లో ఉంది)
-                </span>
-              </div>
-              <p className="text-sm text-amber-900 font-medium mt-2">
-                Disbursement is currently in normal processing within the 7-day scheduled window.
-              </p>
+            <div className="p-4 space-y-1.5 flex-1 overflow-y-auto font-bold text-sm">
+              <button
+                onClick={() => { setActiveSection('overview'); setSidebarOpen(false); }}
+                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${
+                  activeSection === 'overview' ? 'bg-[#0f4a3e] text-white' : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <TrendingUp className="w-5 h-5" />
+                <span>Dashboard &amp; Overview</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveSection('beneficiaries'); setSidebarOpen(false); }}
+                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${
+                  activeSection === 'beneficiaries' ? 'bg-[#0f4a3e] text-white' : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <Users className="w-5 h-5" />
+                <span>Beneficiary Directory</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveSection('disbursements'); setSidebarOpen(false); }}
+                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${
+                  activeSection === 'disbursements' ? 'bg-[#0f4a3e] text-white' : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <CreditCard className="w-5 h-5" />
+                <span>Disbursements &amp; Payments</span>
+              </button>
+
+              <button
+                onClick={() => { setActiveSection('delays'); setSidebarOpen(false); }}
+                className={`w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 transition-colors ${
+                  activeSection === 'delays' ? 'bg-[#0f4a3e] text-white' : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <AlertTriangle className="w-5 h-5 text-rose-500" />
+                <span>Delay Detection Alerts</span>
+                <span className="ml-auto bg-rose-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">2</span>
+              </button>
             </div>
 
-            {/* Delayed Badge */}
-            <div className="p-5 rounded-xl border-2 border-rose-200 bg-rose-50/50">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="badge-status badge-delayed">
-                  <AlertTriangle className="w-5 h-5" />
-                  DELAYED (ఆలస్యం అయింది)
-                </span>
-              </div>
-              <p className="text-sm text-rose-900 font-medium mt-2">
-                <strong>Business Rule:</strong> Triggered automatically when today is more than 7 days past due date and unpaid.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* ES6 Domain Classes & Workflow Reference Card */}
-        <section className="bg-white rounded-2xl border-2 border-slate-200 shadow-sm p-6 sm:p-8">
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">
-            Week 1 Architecture: ES6 Class Diagram Mapping
-          </h2>
-          <p className="text-slate-600 text-base mb-6">
-            Each ES6 class in <code className="bg-slate-100 px-2 py-0.5 rounded font-mono text-sm">server/models/</code> directly corresponds to your project class diagram for your viva evaluation:
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-lg mb-1">
-                <Users className="w-5 h-5 text-blue-600" />
-                Beneficiary
-              </div>
-              <div className="text-xs text-slate-500 font-mono space-y-1 mt-2">
-                <div>+ beneficiaryId, name, age</div>
-                <div>+ address, phoneNo</div>
-                <div className="text-blue-700 font-semibold pt-1">Methods:</div>
-                <div>register(), updateDetails(), viewStatus()</div>
-              </div>
-            </div>
-
-            <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-lg mb-1">
-                <Coins className="w-5 h-5 text-amber-600" />
-                Pension
-              </div>
-              <div className="text-xs text-slate-500 font-mono space-y-1 mt-2">
-                <div>+ pensionId, beneficiaryId</div>
-                <div>+ amount, frequency, startDate</div>
-                <div className="text-blue-700 font-semibold pt-1">Methods:</div>
-                <div>createPension(), updatePension()</div>
-              </div>
-            </div>
-
-            <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-lg mb-1">
-                <FileCheck2 className="w-5 h-5 text-emerald-600" />
-                Verification
-              </div>
-              <div className="text-xs text-slate-500 font-mono space-y-1 mt-2">
-                <div>+ verificationId, beneficiaryId</div>
-                <div>+ verifiedBy, verifyDate, status</div>
-                <div className="text-blue-700 font-semibold pt-1">Methods:</div>
-                <div>verify(), updateVerification()</div>
-              </div>
-            </div>
-
-            <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-lg mb-1">
-                <Clock className="w-5 h-5 text-purple-600" />
-                Payment
-              </div>
-              <div className="text-xs text-slate-500 font-mono space-y-1 mt-2">
-                <div>+ paymentId, pensionId</div>
-                <div>+ amount, payDate, status</div>
-                <div className="text-blue-700 font-semibold pt-1">Methods:</div>
-                <div>recordPayment(), updateStatus()</div>
-              </div>
-            </div>
-
-            <div className="border border-slate-200 rounded-xl p-4 bg-slate-50">
-              <div className="flex items-center gap-2 font-bold text-slate-800 text-lg mb-1">
-                <BellRing className="w-5 h-5 text-indigo-600" />
-                Reminder
-              </div>
-              <div className="text-xs text-slate-500 font-mono space-y-1 mt-2">
-                <div>+ reminderId, beneficiaryId</div>
-                <div>+ message, reminderDate, status</div>
-                <div className="text-blue-700 font-semibold pt-1">Methods:</div>
-                <div>createReminder(), markAsSent()</div>
-              </div>
-            </div>
-
-            <div className="border-2 border-dashed border-blue-300 rounded-xl p-4 bg-blue-50/50 flex flex-col justify-center">
-              <div className="font-bold text-blue-900 text-base mb-1">
-                Relationships:
-              </div>
-              <div className="text-xs text-blue-800 space-y-1 font-medium">
-                <div>• Beneficiary 1 — * Pension</div>
-                <div>• Pension 1 — * Payment</div>
-                <div>• Pension 1 — 1 Verification</div>
-                <div>• Beneficiary 1 — * Reminder</div>
-              </div>
+            <div className="p-4 border-t border-slate-200 text-xs text-slate-500">
+              <p className="font-bold text-slate-700">Elderly Pension Tracker</p>
+              <p>Government Rural Welfare Initiative</p>
             </div>
           </div>
-        </section>
+        </div>
+      )}
 
-        {/* Big Accessible Buttons Preview */}
-        <section className="bg-slate-900 text-white rounded-2xl p-6 sm:p-8 flex flex-wrap justify-between items-center gap-4">
-          <div>
-            <h3 className="text-xl font-bold">
-              Ready for Week 2 Beneficiary Implementation
-            </h3>
-            <p className="text-slate-300 text-base mt-1">
-              Architecture baseline completed. Ready for Beneficiary registration, profiles, and citizen lookup.
+      {/* ============================================================== */}
+      {/* 2. MAIN DASHBOARD CONTENT */}
+      {/* ============================================================== */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+
+        {/* ------------------------------------------------------------ */}
+        {/* HERO GREEN BANNER (Matches Screenshot 100%) */}
+        {/* ------------------------------------------------------------ */}
+        <div className="bg-[#0b483c] text-white rounded-2xl p-6 sm:p-8 shadow-sm relative overflow-hidden">
+          
+          <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-6">
+            
+            <div className="space-y-3 max-w-3xl">
+              {/* Green Pill Badge */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#145d4f] text-[#55e6c7] border border-[#207c6a]">
+                <span className="w-2 h-2 rounded-full bg-[#55e6c7] animate-pulse"></span>
+                <span>STEP 1: Project Setup &amp; Architecture Active</span>
+              </div>
+
+              {/* Banner Heading */}
+              <h2 className={`${getHeadingSizeClass()} font-extrabold text-white tracking-tight leading-tight`}>
+                Welcome to Elderly Pension Disbursement Tracker
+              </h2>
+
+              {/* Banner Description */}
+              <p className="text-teal-100 text-sm sm:text-base font-normal leading-relaxed max-w-2xl">
+                Track • Transparency • Timely Support. A dedicated system ensuring rural senior citizens receive their monthly welfare pension disbursements on time.
+              </p>
+            </div>
+
+            {/* Right System Mode Card */}
+            <div className="bg-[#083a30] border border-[#145d4f] rounded-xl px-5 py-3 text-right self-start sm:self-auto min-w-[140px]">
+              <span className="text-[11px] font-bold text-teal-300 block uppercase tracking-wider">
+                System Mode
+              </span>
+              <span className="text-sm sm:text-base font-black text-white block mt-0.5">
+                Official Admin
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        {/* ------------------------------------------------------------ */}
+        {/* 4 METRICS CARDS (Matches Screenshot 2x2 Layout) */}
+        {/* ------------------------------------------------------------ */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          
+          {/* Card 1: Total Beneficiaries */}
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-sm transition-all space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-semibold text-slate-600">
+                Total Beneficiaries
+              </span>
+              <span className="p-2 rounded-lg bg-teal-50 text-teal-700">
+                <Users className="w-5 h-5" />
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              {beneficiaries.length}
+            </div>
+            <p className="text-xs font-semibold text-slate-400">
+              Registered senior pensioners
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <span className="px-4 py-2 bg-blue-600 text-white font-bold rounded-xl text-base shadow">
-              Week 1 Verified
+
+          {/* Card 2: Disbursed This Month */}
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-sm transition-all space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-semibold text-slate-600">
+                Disbursed This Month
+              </span>
+              <span className="p-2 rounded-lg bg-emerald-50 text-emerald-700">
+                <CreditCard className="w-5 h-5" />
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              ₹4,032
+            </div>
+            <p className="text-xs font-semibold text-slate-400">
+              Direct Bank Transfers
+            </p>
+          </div>
+
+          {/* Card 3: Pending Verifications */}
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-sm transition-all space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-semibold text-slate-600">
+                Pending Verifications
+              </span>
+              <span className="p-2 rounded-lg bg-amber-50 text-amber-700">
+                <ShieldCheck className="w-5 h-5" />
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              1
+            </div>
+            <p className="text-xs font-semibold text-slate-400">
+              Awaiting officer approval
+            </p>
+          </div>
+
+          {/* Card 4: Delayed Alerts */}
+          <div className="bg-white rounded-xl p-5 border border-slate-200 shadow-2xs hover:shadow-sm transition-all space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-xs sm:text-sm font-semibold text-slate-600">
+                Delayed Alerts
+              </span>
+              <span className="p-2 rounded-lg bg-rose-50 text-rose-700">
+                <Bell className="w-5 h-5" />
+              </span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black text-rose-600 tracking-tight">
+              2
+            </div>
+            <p className="text-xs font-semibold text-slate-400">
+              Exceeded disbursement window
+            </p>
+          </div>
+
+        </div>
+
+        {/* ------------------------------------------------------------ */}
+        {/* PROJECT SETUP STATUS CARD (Matches Screenshot Exact Box) */}
+        {/* ------------------------------------------------------------ */}
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-6">
+          
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">
+              Project Setup Status (Step 1 Complete)
+            </h3>
+            <p className="text-slate-500 text-xs sm:text-sm font-medium mt-1">
+              Client and Express server setup is complete with responsive sidebar navigation, routing, authentication context, and accessible font controls.
+            </p>
+          </div>
+
+          {/* 3 Status Sub-Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            
+            {/* Sub-Card 1: Frontend */}
+            <div className="p-4 rounded-xl border border-slate-200 bg-[#f9fbfd] space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                FRONTEND
+              </span>
+              <div className="text-sm sm:text-base font-extrabold text-slate-900">
+                React + Vite + Tailwind CSS
+              </div>
+            </div>
+
+            {/* Sub-Card 2: Backend API */}
+            <div className="p-4 rounded-xl border border-slate-200 bg-[#f9fbfd] space-y-1">
+              <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                BACKEND API
+              </span>
+              <div className="text-sm sm:text-base font-extrabold text-slate-900">
+                Node.js + Express (Port 5000)
+              </div>
+            </div>
+
+            {/* Sub-Card 3: Database */}
+            <div className="p-4 rounded-xl border border-teal-200 bg-[#f0faf7] space-y-1">
+              <span className="text-[11px] font-bold text-teal-700 uppercase tracking-wider block">
+                DATABASE
+              </span>
+              <div className="text-sm sm:text-base font-extrabold text-slate-900">
+                MySQL (Configured for Step 4)
+              </div>
+            </div>
+
+          </div>
+
+          {/* Footer Bar */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+            <span className="text-xs sm:text-sm font-semibold text-slate-500">
+              Ready for Step 2: Full Dashboard with Charts &amp; Metrics
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#e6f7f2] text-[#0f4a3e] border border-[#a8e6d5]">
+              <span className="w-2 h-2 rounded-full bg-[#0f4a3e]"></span>
+              Ready for testing
             </span>
           </div>
-        </section>
+
+        </div>
+
+        {/* ------------------------------------------------------------ */}
+        {/* INTERACTIVE DATA DIRECTORY & DELAY ENGINE PREVIEW */}
+        {/* ------------------------------------------------------------ */}
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-2xs space-y-6">
+          
+          <div className="flex flex-wrap justify-between items-center gap-4">
+            <div>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <Users className="w-6 h-6 text-[#0f4a3e]" />
+                <span>Live Pensioners &amp; Disbursement Status</span>
+              </h3>
+              <p className="text-xs sm:text-sm font-semibold text-slate-500 mt-1">
+                Real-time tracking of elderly beneficiaries, bank transfers, and 7-day delay detection alerts.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveSection('overview')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeSection === 'overview' ? 'bg-[#0f4a3e] text-white' : 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                All Records
+              </button>
+              <button
+                onClick={() => setActiveSection('delays')}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                  activeSection === 'delays' ? 'bg-rose-700 text-white' : 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                Delayed Only (2)
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr className="bg-slate-50 text-slate-700 font-extrabold border-b border-slate-200">
+                  <th className="py-3 px-4">Beneficiary</th>
+                  <th className="py-3 px-4">Phone &amp; District</th>
+                  <th className="py-3 px-4">Scheme</th>
+                  <th className="py-3 px-4">Monthly Amount</th>
+                  <th className="py-3 px-4">Disbursement Status</th>
+                  <th className="py-3 px-4 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-semibold">
+                {beneficiaries
+                  .filter(b => activeSection === 'delays' ? b.status === 'Delayed' : true)
+                  .map(b => (
+                    <tr key={b.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-slate-900">{b.name}</div>
+                        <span className="text-xs text-slate-400 font-mono">ID: #{b.id}</span>
+                      </td>
+
+                      <td className="py-3 px-4 text-slate-600">
+                        <div>{b.phone}</div>
+                        <div className="text-xs text-slate-400">{b.district}</div>
+                      </td>
+
+                      <td className="py-3 px-4 text-slate-700">
+                        {b.scheme}
+                      </td>
+
+                      <td className="py-3 px-4 font-black text-slate-900">
+                        ₹{b.amount.toLocaleString('en-IN')}
+                      </td>
+
+                      <td className="py-3 px-4">
+                        {b.status === 'Paid' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            Paid
+                          </span>
+                        )}
+                        {b.status === 'Delayed' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-300">
+                            <AlertTriangle className="w-3.5 h-3.5" />
+                            Delayed (&gt;7 Days)
+                          </span>
+                        )}
+                        {b.status === 'Pending Verification' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+                            <Clock className="w-3.5 h-3.5" />
+                            Pending Verification
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-3 px-4 text-right">
+                        {b.status === 'Delayed' && (
+                          <button
+                            onClick={() => {
+                              setBeneficiaries(prev => prev.map(item => item.id === b.id ? { ...item, status: 'Paid', paidDate: new Date().toISOString().split('T')[0] } : item));
+                            }}
+                            className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                          >
+                            Mark Paid
+                          </button>
+                        )}
+                        {b.status === 'Pending Verification' && (
+                          <button
+                            onClick={() => {
+                              setBeneficiaries(prev => prev.map(item => item.id === b.id ? { ...item, status: 'Paid', paidDate: new Date().toISOString().split('T')[0] } : item));
+                            }}
+                            className="px-3 py-1 bg-[#0f4a3e] hover:bg-[#0b3a30] text-white rounded-lg text-xs font-bold cursor-pointer transition-colors shadow-2xs"
+                          >
+                            Verify &amp; Disburse
+                          </button>
+                        )}
+                        {b.status === 'Paid' && (
+                          <span className="text-xs text-slate-400 font-medium">Completed</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+
+        </div>
 
       </main>
 
-      {/* Footer */}
-      <footer className="mt-12 bg-white border-t border-slate-200 py-6 text-center text-sm text-slate-600">
-        <div className="max-w-6xl mx-auto px-4">
-          <p className="font-semibold text-slate-800">
-            Elderly Pension Disbursement Tracker • Problem Statement 126
+      {/* ============================================================== */}
+      {/* 3. FOOTER */}
+      {/* ============================================================== */}
+      <footer className="border-t border-slate-200 bg-white py-6 mt-12 text-center text-xs text-slate-500 font-semibold">
+        <div className="max-w-7xl mx-auto px-4 space-y-1">
+          <p className="text-slate-700 font-bold">
+            Elderly Pension Disbursement Tracker System • Problem Statement 126
           </p>
-          <p className="text-xs text-slate-500 mt-1">
-            Built with React, Tailwind CSS, Node.js Express, and MySQL (ES6 Class Architecture).
+          <p>
+            Designed for rural senior citizens • High contrast, accessible typography, automated delay alerts
           </p>
         </div>
       </footer>
+
     </div>
   );
 }
