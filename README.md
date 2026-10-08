@@ -2,6 +2,9 @@
 
 A transparent, accessible web platform designed for elderly rural citizens and government officials to monitor pension disbursements, detect payment delays, automate reminders, and generate administrative reports.
 
+- 🌐 **Live Public Portal**: [https://25091a3237-netizen.github.io/elderly-pension-tracker/](https://25091a3237-netizen.github.io/elderly-pension-tracker/)
+- 💻 **GitHub Repository**: [https://github.com/25091a3237-netizen/elderly-pension-tracker](https://github.com/25091a3237-netizen/elderly-pension-tracker)
+
 ---
 
 ## 🏛️ Project Architecture (Week 1)
