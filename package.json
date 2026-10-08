@@ -1,0 +1,21 @@
+{
+  "name": "elderly-pension-tracker",
+  "version": "1.0.0",
+  "description": "Elderly Pension Disbursement Tracker - Problem Statement 126",
+  "scripts": {
+    "server": "npm --prefix server start",
+    "server:dev": "npm --prefix server run dev",
+    "client": "npm --prefix client run dev",
+    "init-db": "npm --prefix server run init-db"
+  },
+  "keywords": [
+    "pension",
+    "tracker",
+    "react",
+    "tailwind",
+    "express",
+    "mysql"
+  ],
+  "author": "",
+  "license": "ISC"
+}

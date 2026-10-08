@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-size: 1.125rem; /* 18px base text for elderly readability */
+    line-height: 1.6;
+    color: #1e293b;
+    background-color: #f8fafc;
+  }
+}
+
+/* Big accessible touch buttons */
+.btn-elderly {
+  @apply px-6 py-3.5 text-lg font-bold rounded-xl shadow-md transition-all duration-200 active:scale-95 flex items-center justify-center gap-2;
+}
+
+.btn-elderly-primary {
+  @apply bg-blue-700 hover:bg-blue-800 text-white shadow-blue-900/20;
+}
+
+.btn-elderly-secondary {
+  @apply bg-white hover:bg-slate-100 text-slate-800 border-2 border-slate-300;
+}
+
+/* High contrast status pills */
+.badge-status {
+  @apply inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-base font-bold;
+}
+
+.badge-paid {
+  @apply bg-emerald-100 text-emerald-800 border border-emerald-400;
+}
+
+.badge-pending {
+  @apply bg-amber-100 text-amber-800 border border-amber-400;
+}
+
+.badge-delayed {
+  @apply bg-rose-100 text-rose-800 border border-rose-400 animate-pulse;
+}
